@@ -43,6 +43,13 @@ const renderPokemon = (pokemon) => {
  
   const fetchedPokemon = async (e) => {
     e.preventDefault();
+
+    const fetchedPokemon = async () => {
+      const res = await fetch(`${baseURL}`);
+      const data = await res.json();
+    
+      return data;
+    };
   
     const searchedPokemon = input_buton.value.trim();
   
@@ -50,9 +57,8 @@ const renderPokemon = (pokemon) => {
       alert("Por favor ingrese un número");
       return;
     }
-    const fetchedPokemon = await baseURL(Number(searchedPokemon));
-  
-    if (!fetchedPokemon.id) {
+    
+     if (!searchedPokemon.id) {
       alert("El numero ingresado no existe.");
       form.reset();
       return;
