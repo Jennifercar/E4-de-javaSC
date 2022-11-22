@@ -4,15 +4,19 @@ const form = document.getElementById("form")
 const input_buton = document.getElementById('input-buton')
 
 
-let pokemon = JSON.parse(localStorage.getItem("pokemon")) || [];
+let pokemones = JSON.parse(localStorage.getItem("pokemones")) || [];
 
 const saveLocalStorage = (pokeList) => {
-  localStorage.setItem("pokemon", JSON.stringify(pokeList));
+  localStorage.setItem("pokemones", JSON.stringify(pokeList));
 };
 
 const baseURL = "https://pokeapi.co/api/v2/pokemon/";
 
+let isFetching = false;
 
+const nextURL = {
+  next: null,
+};
 
 const renderPokemon = (pokemon) => {
     const { id, name, sprites, height, weight, types } = pokemon;
@@ -40,40 +44,43 @@ const renderPokemon = (pokemon) => {
     conteiner.innerHTML = pokeList.map((pokemon) => renderPokemon(pokemon)).join("");
   };
 
- 
-  const fetchedPokemon = async (e) => {
+  const searchPoke = async (e) => {
     e.preventDefault();
-
-    const fetchedPokemon = async () => {
+  
+    const searchedPoke = input_buton.value.trim();
+  
+    if (searchedPoke === "") {
+      alert("Por favor ingrese un numero");
+      return;
+    }
+     }
+    const fetchPokemons = async () => {
       const res = await fetch(`${baseURL}`);
       const data = await res.json();
     
       return data;
     };
-  
-    const searchedPokemon = input_buton.value.trim();
-  
-    if (searchedPokemon === "") {
-      alert("Por favor ingrese un número");
-      return;
-    }
+
+    function init() {
+      window.addEventListener("DOMContentLoaded", async () => {
+        let { next, results } = await fetchPokemons();
     
-     if (!searchedPokemon.id) {
-      alert("El numero ingresado no existe.");
-      form.reset();
-      return;
-    }
+        nextURL.next = next;
+    
+        const URLS = results.map((pokemon) => pokemon.url);
+    
+        const InfoPokemones = await Promise.all(
+          URLS.map(async (url) => {
+            const nextPokemons = await fetch(url);
+            return await nextPokemons.json();
+          })
+        );
+    
+        renderPokemonList(InfoPokemones);
+      });
+ }
+
   
-    pokemon = [fetchedPokemon];
-    renderPokemonList(pokemon);
-    saveLocalStorage(pokemon);
-    form.reset();
-  };
-
-
-    const init = () => {
-      renderPokemonList(pokemon);
-      form.addEventListener("submit", fetchedPokemon);
-     
-    };
-    init();
+  
+  init();
+  
