@@ -50,6 +50,9 @@ const renderPokemon = (pokemon) => {
       alert("Por favor ingrese un numero");
       return;
     }
+    renderPokemonList(fetchPokemons)
+    
+  };
      
 const fetchPokemons = async () => {
       const res = await fetch(`${baseURL}`);
@@ -58,10 +61,6 @@ const fetchPokemons = async () => {
       return data;
     };
     
-    renderPokemonList(fetchPokemons)
-    
-};
-
 
  
  const init = () => {
